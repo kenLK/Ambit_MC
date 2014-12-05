@@ -48,6 +48,10 @@
     NSString* urlString = [[NSString alloc] initWithFormat:@"%@%@?",[MCVarible getInstance].useServerURL,SDKUserLogin];
     urlString = [urlString stringByAppendingFormat:@"SYS_ID=%@&",sysID];
     urlString = [urlString stringByAppendingFormat:@"USER_PASSWORD=%@&",password];
+    
+    MCLogger(@"range====0.0==>%d",range.location);
+    
+    MCLogger(@"range====1.0==>%@",account);
     if (range.location == NSNotFound) {
         urlString = [urlString stringByAppendingFormat:@"PHONE=%@&",account];
     }else{
@@ -622,7 +626,11 @@
     urlString = [urlString stringByAppendingFormat:@"USER_PASSWORD=%@&",userPassword];
     
     NSRange range = [account rangeOfString:@"@"];
-    if (range.location > -1) {
+    
+    
+    MCLogger(@"location====0.0==>%d",range.location);
+    
+    if (range.length > 0) {
         
         urlString = [urlString stringByAppendingFormat:@"EMAIL=%@&",account];
     }else{
