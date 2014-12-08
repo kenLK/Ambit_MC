@@ -62,7 +62,7 @@
 //    [_fbLoginView setReadPermissions:@[@"public_profile"]];
 //    [_fbLoginView setDelegate:self];
 //    _objectID = nil;
-    [FBSettings setDefaultAppID: @"278394499030531"];
+//    [FBSettings setDefaultAppID: @"278394499030531"];
     
 //    FBSession openActiveSessionWithReadPermissions:<#(NSArray *)#> allowLoginUI:<#(BOOL)#> completionHandler:<#^(FBSession *session, FBSessionState status, NSError *error)handler#>
 
@@ -228,10 +228,12 @@
     
     // try to open session with existing valid token
     NSArray *permissions = [[NSArray alloc] initWithObjects:
-                            @"publish_actions",@"email",
+//                            @"publish_actions",
+                            @"public_profile",
+                            @"email",
                             nil];
-//    FBSession *session = [[FBSession alloc] initWithPermissions:permissions];
-//    [FBSession setActiveSession:session];
+    FBSession *session = [[FBSession alloc] initWithPermissions:permissions];
+    [FBSession setActiveSession:session];
     //         openActiveSessionWithReadPermissions
     [FBSession openActiveSessionWithReadPermissions:permissions
                                        allowLoginUI:YES
