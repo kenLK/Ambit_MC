@@ -30,4 +30,7 @@
 //open id 註冊
 #define SDKOauthRegister    @"SDKOauthRegister"
 
+//亞太會員帳號 登入
+#define SDKAPTGUserLogin    @"aptg/aptgloginpage"
+
 #endif

@@ -51,4 +51,9 @@
 - (BOOL) getLoginResult;
 @property (assign) NSString *returnJason;
 
+
+-(NSString*) GetAPTGUserInfoViaBase:(NSString *) account
+                        userPassword:(NSString *)userPassword
+                               sysID:(NSString*) sysID;
+
 @end

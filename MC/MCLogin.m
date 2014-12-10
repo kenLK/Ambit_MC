@@ -670,6 +670,51 @@
 - (BOOL) getLoginResult {
     return mLoginResult;
 }
+- (NSString*) GetAPTGUserInfoViaBase:(NSString *)account userPassword:(NSString *)userPassword sysID:(NSString *)sysID{
+    MCVarible* mcv = [MCVarible getInstance];
+    //sysid,login_type,uid
+    //    NSString* verifyStr = [NSString stringWithFormat:@"%@%@%@",email,uid,uid];
+    //    NSString* verifyCode = [mcv sha1:verifyStr];
+    NSString* returnStr = @"";
+    
+    NSRange range = [account rangeOfString:@"@"];
+    
+    
+    NSString* urlString = [[NSString alloc] initWithFormat:@"%@%@?",[MCVarible getInstance].useServerURL,SDKAPTGUserLogin];
+    urlString = [urlString stringByAppendingFormat:@"SYS_ID=%@&",sysID];
+    urlString = [urlString stringByAppendingFormat:@"USER_PASSWORD=%@&",userPassword];
+    
+    MCLogger(@"range====0.0==>%d",range.location);
+    
+    MCLogger(@"range====1.0==>%@",account);
+    if (range.length > 0) {
+//        urlString = [urlString stringByAppendingFormat:@"PHONE=%@&",account];
+        urlString = [urlString stringByAppendingFormat:@"EMAIL=%@&",account];
+    }else{
+        urlString = [urlString stringByAppendingFormat:@"PHONE=%@&",account];
+    }
+    
+    
+    MCLogger(@"url====0.0==>%@",urlString);
+    NSMutableURLRequest *urlrequest = [[NSMutableURLRequest alloc] init];
+    [urlrequest setTimeoutInterval:20];
+    [urlrequest setURL:[NSURL URLWithString:urlString]];
+    
+    NSURLResponse* response = nil;
+    NSError* error = nil;
+    NSData* data = [NSURLConnection sendSynchronousRequest:urlrequest
+                                         returningResponse:&response
+                                                     error:&error];
+    NSInteger responseCode = [(NSHTTPURLResponse *)response statusCode];
+    
+    if(data != nil && !error && responseCode == 200){
+        MCLogger(@"%@",[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+        returnStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    }
+    
+    return returnStr;
+
+}
 #pragma mark -
 #pragma mark Webview part
 
