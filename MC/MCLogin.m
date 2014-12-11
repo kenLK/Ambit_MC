@@ -412,7 +412,7 @@
             if([(NSString *)[components objectAtIndex:1] isEqualToString:@"myfunction"]) {
                 MCLogger(@"bundlingJason>>>>>>>%@",[components objectAtIndex:2]);
                 self.returnJason = (NSString*)[components objectAtIndex:2];
-                [userPrefs setObject:[components objectAtIndex:2] forKey:@"bundlingJason"];
+                [userPrefs setObject:[components objectAtIndex:2] forKey:@"returnJason"];
                 [userPrefs synchronize];
                 [self setMLoginResult:YES];
                 /*if ([[components objectAtIndex:4] isEqualToString:@"0"]) {
@@ -715,6 +715,38 @@
     return returnStr;
 
 }
+
+-(id) initAPTGWithWebView{
+    MCLogger(@"INTO >>>>>> initWithWebView");
+    
+    self = [self init];
+    
+    
+    if (self) {
+        MCVarible* gVar = [MCVarible getInstance];
+        
+        
+        CGRect webFrame = CGRectMake(0.0, 0.0, self.view.frame.size.width,self.view.frame.size.height);
+        UIWebView *webView = [[UIWebView alloc] initWithFrame:webFrame];
+        
+        NSString* urlString = [[NSString alloc] initWithFormat:@"%@%@?",gVar.useServerURL,SDKAPTGUserLogin];
+        
+        [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookieAcceptPolicy:NSHTTPCookieAcceptPolicyAlways];
+
+//        if ([self initialFramework] == YES) {
+            [self setMLoginResult:NO];
+            [self setMWebView:webView];
+            [self setURL:urlString];
+            mFlag = [[NSMutableString alloc] init];
+            userPrefs = [NSUserDefaults standardUserDefaults];
+            
+        
+//        }
+    }
+    MCLogger(@"END >>>>>> initWithWebView");
+    return self;
+}
+
 #pragma mark -
 #pragma mark Webview part
 
