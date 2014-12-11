@@ -683,7 +683,7 @@
     NSString* urlString = [[NSString alloc] initWithFormat:@"%@%@?",[MCVarible getInstance].useServerURL,SDKAPTGUserLogin];
     urlString = [urlString stringByAppendingFormat:@"SYS_ID=%@&",sysID];
     urlString = [urlString stringByAppendingFormat:@"USER_PASSWORD=%@&",userPassword];
-    
+    urlString = [urlString stringByAppendingFormat:@"SDK=IOS&",userPassword];    
     MCLogger(@"range====0.0==>%d",range.location);
     
     MCLogger(@"range====1.0==>%@",account);
