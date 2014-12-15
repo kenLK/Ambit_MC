@@ -716,7 +716,7 @@
 
 }
 
--(id) initAPTGWithWebView{
+-(id) initAPTGWithWebView: (UIWebView*) web{
     MCLogger(@"INTO >>>>>> initWithWebView");
     
     self = [self init];
@@ -726,16 +726,14 @@
         MCVarible* gVar = [MCVarible getInstance];
         
         
-        CGRect webFrame = CGRectMake(0.0, 0.0, self.view.frame.size.width,self.view.frame.size.height);
-        UIWebView *webView = [[UIWebView alloc] initWithFrame:webFrame];
         
         NSString* urlString = [[NSString alloc] initWithFormat:@"%@%@?",gVar.useServerURL,SDKAPTGUserLogin];
-        
+        urlString = [urlString stringByAppendingFormat:@"SDK=IOS&"];
         [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookieAcceptPolicy:NSHTTPCookieAcceptPolicyAlways];
 
 //        if ([self initialFramework] == YES) {
             [self setMLoginResult:NO];
-            [self setMWebView:webView];
+            [self setMWebView:web];
             [self setURL:urlString];
             mFlag = [[NSMutableString alloc] init];
             userPrefs = [NSUserDefaults standardUserDefaults];
@@ -751,7 +749,7 @@
 #pragma mark Webview part
 
 - (void) setURL: (NSString*) urlStr {
-    MCLogger(@"INTO >>>>>> setURL");
+    MCLogger(@"INTO >>>>>> setURL>>>%@",urlStr);
 
     NSURL *url = [NSURL URLWithString:urlStr];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];

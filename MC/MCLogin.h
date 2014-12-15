@@ -56,5 +56,5 @@
                         userPassword:(NSString *)userPassword
                                sysID:(NSString*) sysID;
 
--(id) initAPTGWithWebView;
+-(id) initAPTGWithWebView: (UIWebView*) web;
 @end
