@@ -13,6 +13,9 @@
 
 @property (strong, nonatomic) NSString *objectID;
 
+@property (strong, nonatomic) ACAccountStore *accountStore;//ACAccountStore
+
+
 @end
 
 @implementation MCFacebook
@@ -58,14 +61,70 @@
 }
 
 - (void) viewDidLoad {
-    // Ask for basic permissions on login
-//    [_fbLoginView setReadPermissions:@[@"public_profile"]];
-//    [_fbLoginView setDelegate:self];
-//    _objectID = nil;
-//    [FBSettings setDefaultAppID: @"278394499030531"];
+    /*
     
-//    FBSession openActiveSessionWithReadPermissions:<#(NSArray *)#> allowLoginUI:<#(BOOL)#> completionHandler:<#^(FBSession *session, FBSessionState status, NSError *error)handler#>
+    if ([SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook]) // check Facebook is configured in Settings or not
+    {
+        self.accountStore = [[ACAccountStore alloc] init]; // you have to retain ACAccountStore
+        
+        ACAccountType *facebookAcc = [self.accountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierFacebook];
+        
+        
+        NSDictionary *options = @{
+                                  @"ACFacebookAppIdKey" : @"1483100008608308",
+                                  @"ACFacebookPermissionsKey" : @[@"email"],
+                                  @"ACFacebookAudienceKey" : ACFacebookAudienceEveryone}; // Needed only when write permissions are requested
+        
+        NSDictionary *emailReadPermisson = @{
+                                             ACFacebookAppIdKey : @"1483100008608308",
+                                             ACFacebookPermissionsKey : @[@"email"],
+                                             ACFacebookAudienceKey : ACFacebookAudienceEveryone,
+                                             };
 
+        [self.accountStore requestAccessToAccountsWithType:facebookAcc options:emailReadPermisson completion:^(BOOL granted, NSError *error)
+         {
+             if (granted)
+             {
+                 NSArray *accountsArray = [self.accountStore accountsWithAccountType:facebookAcc];
+                 //[AppCommon hideProgressHUD];
+                 NSDictionary *facebookAccount = [[self.accountStore accountsWithAccountType:facebookAcc] lastObject];
+                 NSLog(@"facebook UserName: %@", [facebookAccount valueForKey:@"username"]);
+                 
+                 ACAccount *account = accountsArray[0];
+
+                 NSString* userID = ((NSDictionary*)[account valueForKey:@"properties"])[@"user_id"];
+                 [[NSUserDefaults standardUserDefaults] setObject:userID forKey:@"facebookUserID"];
+                 [[NSUserDefaults standardUserDefaults] setObject:[facebookAccount valueForKey:@"username"] forKey:@"facebookUserEMAIL"];
+                 [[NSUserDefaults standardUserDefaults] synchronize];
+                 [self dismissViewControllerAnimated:YES completion:nil];
+                 
+                 MCLogger(@"facebookAcc>>>>>userID>>>>>>%@>>>>>>",userID);
+             }
+             else
+             {
+                 if (error == nil) {
+                     NSLog(@"User Has disabled your app from settings...");
+                     UIAlertView *alert  = [[UIAlertView alloc] initWithTitle:@"error" message:@"User Has disabled your app from settings" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+                     [alert show];
+                 }
+                 else
+                 {
+                     NSLog(@"Error in Login: %@", error);
+                     
+                     UIAlertView *alert  = [[UIAlertView alloc] initWithTitle:@"error" message:@"login Fail" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+                     [alert show];
+                 }
+             }
+         }];
+    }
+    else
+    {
+        //[AppCommon hideProgressHUD];
+        NSLog(@"Not Configured in Settings......"); // show user an alert view that facebook is not configured in settings.
+        UIAlertView *alert  = [[UIAlertView alloc] initWithTitle:@"error" message:@"Not Configured in Settings" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+        [alert show];
+    }
+    */
 }
 
 - (NSString*)requestUserInfo
@@ -253,108 +312,19 @@
              NSMutableString *userInfo = [[NSMutableString alloc] init];
              NSLog(@"user : %@", user);
              success(user);
-             // Example: typed access (name)
-             // - no special permissions required
-             [userInfo appendString: [NSString stringWithFormat:@"Name : %@\n\n",user.name]];
-             
-             // Example: typed access, (birthday)
-             // - requires user_birthday permission
-             [userInfo appendString: [NSString stringWithFormat:@"Birthday : %@\n\n",user.birthday]];
-             
-             // Example: partially typed access, to location field,
-             // name key (location)
-             // - requires user_location permission
-             [userInfo appendString: [NSString stringWithFormat:@"Location : %@\n\n", user.location[@"name"]]];
-             
-             // Example: access via key (locale)
-             // - no special permissions required
-             [userInfo appendString: [NSString stringWithFormat:@"Locale : %@\n\n", user[@"locale"]]];
-             
-             // Example: access via key for array (languages)
-             // - requires user_likes permission
-             if (user[@"languages"]) {
-                 NSArray *languages = user[@"languages"];
-                 NSMutableArray *languageNames = [[NSMutableArray alloc] init];
-                 for (int i = 0; i < [languages count]; i++) {
-                     languageNames[i] = languages[i][@"name"];
-                 }
-                 [userInfo stringByAppendingString:
-                  [NSString stringWithFormat:@"Languages: %@\n\n", languageNames]];
-             }
-             
-             // Display the user info
-//             self.showView.text = userInfo;
              
          }else {
-             NSLog(@"error : %@", error);
+             //NSLog(@"error : %@", error);
+                 [FBRequestConnection startForMeWithCompletionHandler:^(FBRequestConnection *connection, id<FBGraphUser> user, NSError *error) {
+                     
+                      if (!error) {
+                          success(user);
+                      }
+                 }];
+             
          }
      }];
     
-//    openActiveSessionWithReadPermissions
- /*   if([FBSession openActiveSessionWithAllowLoginUI:NO]) {
-        // post to wall
-        [[FBRequest requestForMe] startWithCompletionHandler:^(FBRequestConnection *connection, NSDictionary<FBGraphUser> *user, NSError *error) {
-            if (!error) {
-                NSString* gemail = [user objectForKey:@"email"];
-                NSString* gfacebookID = [user objectForKey:@"id"];
-                MCLogger(@" >>>>>>>>>>Email = %@",gemail);
-                MCLogger(@" >>>>>>>>>>facebookID = %@",gfacebookID);
-                
-                success(user);
-            }
-        }];
-    }
-
-    if ([self facebookID].length == 0) {
-     
-        if(FBSession.activeSession.isOpen){
-            
-            [[FBRequest requestForMe] startWithCompletionHandler:^(FBRequestConnection *connection, NSDictionary<FBGraphUser> *user, NSError *error) {
-                if (!error) {
-                    success(user);
-                }
-            }];
-            
-            MCLogger(@"POST TO WALL -- %@",FBSession.activeSession.accessToken);
-    //        [self publishFacebook];
-
-        }else {
-            // try to open session with existing valid token
-            NSArray *permissions = [[NSArray alloc] initWithObjects:
-                                    @"publish_actions",@"email",
-                                    nil];
-            FBSession *session = [[FBSession alloc] initWithPermissions:permissions];
-            [FBSession setActiveSession:session];
-            if([FBSession openActiveSessionWithAllowLoginUI:NO]) {
-                // post to wall
-                [[FBRequest requestForMe] startWithCompletionHandler:^(FBRequestConnection *connection, NSDictionary<FBGraphUser> *user, NSError *error) {
-                    if (!error) {                    
-                        success(user);
-                    }
-                    
-                }];
-                
-                MCLogger(@"POST TO WALL -- %@",FBSession.activeSession.accessToken);
-    //            [self publishFacebook];
-            } else {
-                // you need to log the user
-                MCLogger(@"login");
-                
-                [FBSession openActiveSessionWithPermissions:permissions
-                                               allowLoginUI:YES
-                                          completionHandler:^(FBSession *session,
-                                                              FBSessionState state,
-                                                              NSError *error) {
-                                              MCLogger(@"POST TO WALL -- %@",FBSession.activeSession.accessToken);
-    //                                          [self publishFacebook];
-                                              
-                                          }];
-                
-            }
-            
-        }
-    }
-    */
     MCLogger(@"getUserInfo>>>>>>>>>>>>>END>>>>>>>>>>>>>>");
 }
 - (void)checkState{
