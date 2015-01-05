@@ -17,8 +17,14 @@
 
 @property (strong, nonatomic) NSString *facebookID;
 
+@property BOOL isLogin;
 
 - (void)getUserInfoWithSuccess:(void (^)(id responseObject))success
                      failure:(void (^)(NSError *error))failure;
+- (void)login:(void (^)(id responseObject))success
+      failure:(void (^)(NSError *error))failure;
+
+- (void)getUser:(void (^)(id responseObject))success
+        failure:(void (^)(NSError *error))failure;
 
 @end

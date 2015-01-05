@@ -19,7 +19,7 @@
 @end
 
 @implementation MCFacebook
-@synthesize facebookID,email;
+@synthesize facebookID,email,isLogin;
 
 - (id) init
 {
@@ -27,6 +27,7 @@
     {
         self.facebookID = @""; // do your own initialisation here
         self.email = @"";
+        self.isLogin = NO;
     }
     return self;
 }
@@ -356,6 +357,7 @@
             
         case FBSessionStateOpen:
             NSLog(@"%@", (nowState==FBSessionStateOpen)?@"FBSessionStateOpen":@"FBSessionStateCreatedTokenLoaded");
+            isLogin = YES;
 //            MainViewController *main = [[[MainViewController alloc] init] autorelease];
 //            [self presentViewController:main animated:YES completion:nil];
             break;
@@ -365,6 +367,8 @@
             break;
     }
 }
+
+
 
 
 -(NSDictionary*)getTestInfo:(NSString *)user
@@ -522,6 +526,60 @@
                                cancelButtonTitle:@"Ok"
                                otherButtonTitles:nil]
               show];
+             
+         }
+     }];
+}
+
+-(void)login:(void (^)(id))success
+     failure:(void (^)(NSError *))failure{
+
+    MCLogger(@"getUserInfo>>>>>>>>>>>>>INTO>>>>>>>>>>>>>>");
+    //    NSDictionary *userData = [NSDictionary dictionary] ;
+    
+    
+    // try to open session with existing valid token
+    NSArray *permissions = [[NSArray alloc] initWithObjects:
+                            //                            @"publish_actions",
+                            @"public_profile",
+                            @"email",
+                            nil];
+    FBSession *session = [[FBSession alloc] initWithPermissions:permissions];
+    [FBSession setActiveSession:session];
+    //         openActiveSessionWithReadPermissions
+    [FBSession openActiveSessionWithReadPermissions:permissions
+                                       allowLoginUI:YES
+                                  completionHandler:^(FBSession *session,
+                                                      FBSessionState status,
+                                                      NSError *error) {
+                                      if (!error) {
+                                          success(session);
+                                      }
+                                      //    called while state changed
+                                      [self checkState];
+                                  }];
+}
+
+-(void)getUser:(void (^)(id))success failure:(void (^)(NSError *))failure{
+ 
+    [FBRequestConnection
+     startForMeWithCompletionHandler:^(FBRequestConnection *connection,
+                                       id<FBGraphUser> user,
+                                       NSError *error) {
+         NSLog(@"Response done.");
+         if (!error) {
+             NSMutableString *userInfo = [[NSMutableString alloc] init];
+             NSLog(@"user : %@", user);
+             success(user);
+             
+         }else {
+             //NSLog(@"error : %@", error);
+             [FBRequestConnection startForMeWithCompletionHandler:^(FBRequestConnection *connection, id<FBGraphUser> user, NSError *error) {
+                 
+                 if (!error) {
+                     success(user);
+                 }
+             }];
              
          }
      }];
