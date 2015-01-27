@@ -554,6 +554,8 @@
                                                       NSError *error) {
                                       if (!error) {
                                           success(session);
+                                      }else{
+                                          failure(error);
                                       }
                                       //    called while state changed
                                       [self checkState];
@@ -561,6 +563,17 @@
 }
 
 -(void)getUser:(void (^)(id))success failure:(void (^)(NSError *))failure{
+    
+    
+    NSString *plistPath = [[NSBundle mainBundle] pathForResource:@"MCCONFIG" ofType:@"plist"];
+    
+    NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:plistPath];
+    NSString* ottName = nil;
+    if (plistPath == nil) {
+        ottName = @"";
+    }else{
+        ottName = (NSString*)[dict objectForKey:@"OTT_NAME"];
+    }
  
     [FBRequestConnection
      startForMeWithCompletionHandler:^(FBRequestConnection *connection,
@@ -570,14 +583,42 @@
          if (!error) {
              NSMutableString *userInfo = [[NSMutableString alloc] init];
              NSLog(@"user : %@", user);
-             success(user);
+//             success(user);
+             
+             MCLogin* mcl = [[MCLogin alloc] init];
+             self.email = [user objectForKey:@"email"];
+             self.facebookID = [user objectForKey:@"id"];
+             [mcl GetAmbitUserInfoViaOpenID:self.email
+                                    openUID:self.facebookID
+                                 login_type:LOGIN_TYPE_FACEBOOK
+                                      sysID:ottName
+                                    success:^(id responseObject) {
+                                        success(responseObject);
+                                    } failure:^(NSError *error) {
+                                        failure(error);
+                                    }];
              
          }else {
              //NSLog(@"error : %@", error);
              [FBRequestConnection startForMeWithCompletionHandler:^(FBRequestConnection *connection, id<FBGraphUser> user, NSError *error) {
                  
                  if (!error) {
-                     success(user);
+//                     success(user);
+
+                     MCLogin* mcl = [[MCLogin alloc] init];
+                     self.email = [user objectForKey:@"email"];
+                     self.facebookID = [user objectForKey:@"id"];
+                     [mcl GetAmbitUserInfoViaOpenID:self.email
+                                            openUID:self.facebookID
+                                         login_type:LOGIN_TYPE_FACEBOOK
+                                              sysID:ottName
+                                            success:^(id responseObject) {
+                                                success(responseObject);
+                                            } failure:^(NSError *error) {
+                                                failure(error);
+                                            }];
+                 }else{
+                     failure(error);
                  }
              }];
              
