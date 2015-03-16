@@ -20,7 +20,7 @@
 @end
 
 @implementation MCGooglePlus
-@synthesize signIn,group;
+@synthesize signIn,group,email,googlePlusID;
 ///google plus client id
 static NSString * const kClientId = @"1039948666930-tc2134amp1a1r836b5iq5lf2pnnq3s05.apps.googleusercontent.com";
 
@@ -78,6 +78,16 @@ static NSString * const kClientId = @"1039948666930-tc2134amp1a1r836b5iq5lf2pnnq
                    error: (NSError *) error
 {
     NSLog(@"Received error %@ and auth object %@",error, auth);
+    //取得 八大生活的註冊在mc的名稱
+    NSString *plistPath = [[NSBundle mainBundle] pathForResource:@"MCCONFIG" ofType:@"plist"];
+    
+    NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:plistPath];
+    NSString* ottName = nil;
+    if (plistPath == nil) {
+        ottName = @"";
+    }else{
+        ottName = (NSString*)[dict objectForKey:@"OTT_NAME"];
+    }
     
     if(!error) {
         // Get the email address.
@@ -111,6 +121,23 @@ static NSString * const kClientId = @"1039948666930-tc2134amp1a1r836b5iq5lf2pnnq
                         [[NSUserDefaults standardUserDefaults] setObject:person.identifier forKey:@"googleUserID"];
                         [[NSUserDefaults standardUserDefaults] setObject:signIn.authentication.userEmail forKey:@"googleUserEMAIL"];
                         [[NSUserDefaults standardUserDefaults] synchronize];
+                        
+                        
+                        self.email = signIn.authentication.userEmail;
+                        self.googlePlusID = person.identifier;
+                        
+                        //login to MC server
+                        MCLogin* mcl = [[MCLogin alloc] init];
+                        [mcl GetAmbitUserInfoViaOpenID:signIn.authentication.userEmail
+                                               openUID:person.identifier
+                                            login_type:LOGIN_TYPE_GOOGLE
+                                                 sysID:ottName
+                                               success:^(id responseObject) {
+//                                                   success(responseObject);
+                                                   
+                                               } failure:^(NSError *error) {
+
+                                               }];
                         [self dismissViewControllerAnimated:YES completion:nil];
 
 //                        NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:signIn.authentication.userEmail, @"EMAIL",person.identifier,@"GOOGLEUSERID",nil];
@@ -120,54 +147,6 @@ static NSString * const kClientId = @"1039948666930-tc2134amp1a1r836b5iq5lf2pnnq
     }
     //[self dismissViewControllerAnimated:YES completion:nil];
 }
-/*
-- (BOOL)application: (UIApplication *)application
-            openURL: (NSURL *)url
-  sourceApplication: (NSString *)sourceApplication
-         annotation: (id)annotation {
-    
-    NSLog(@"%@",sourceApplication);
 
-//    return NO;
-    return [GPPURLHandler handleURL:url
-                  sourceApplication:sourceApplication
-                         annotation:annotation];
-}*/
--(void)getUserInfoWithSuccess:(void (^)(id))success failure:(void (^)(NSError *))failure{
-    
-    //information >>>>start
-    GTLServicePlus* plusService = [[GTLServicePlus alloc] init];
-    plusService.retryEnabled = YES;
-    
-    [plusService setAuthorizer:[GPPSignIn sharedInstance].authentication];
-    
-    GTLQueryPlus *query = [GTLQueryPlus queryForPeopleGetWithUserId:@"me"];
-    
-    [plusService executeQuery:query
-            completionHandler:^(GTLServiceTicket *ticket,
-                                GTLPlusPerson *person,
-                                NSError *error) {
-                if (error) {
-                    GTMLoggerError(@"Error: %@", error);
-                    MCLogger(@"Error: %@", error);
-                    failure(error);
-                } else {
-                    // Retrieve the display name and "about me" text
-                    //                    [person retain];
-                    NSString *description = [NSString stringWithFormat:
-                                             @"%@\n%@", person.displayName,
-                                             person.aboutMe];
-                    MCLogger(@"%@",description);
-                    MCLogger(@"userID>>>>%@<<<<",person.identifier);
-                    [[NSUserDefaults standardUserDefaults] setObject:person.identifier forKey:@"googleUserID"];
-                    
-                    [[NSUserDefaults standardUserDefaults] synchronize];
-                    NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:signIn.authentication.userEmail, @"EMAIL",person.identifier,@"GOOGLEUSERID",nil];
-                    success(dict);
-                }
-            }];
-    //information >>>>ends
-
-}
 
 @end
