@@ -579,6 +579,9 @@
      startForMeWithCompletionHandler:^(FBRequestConnection *connection,
                                        id<FBGraphUser> user,
                                        NSError *error) {
+
+         
+         
          NSLog(@"Response done.");
          if (!error) {
              NSMutableString *userInfo = [[NSMutableString alloc] init];
@@ -588,35 +591,76 @@
              MCLogin* mcl = [[MCLogin alloc] init];
              self.email = [user objectForKey:@"email"];
              self.facebookID = [user objectForKey:@"id"];
-             [mcl GetAmbitUserInfoViaOpenID:self.email
-                                    openUID:self.facebookID
-                                 login_type:LOGIN_TYPE_FACEBOOK
-                                      sysID:ottName
-                                    success:^(id responseObject) {
-                                        success(responseObject);
-                                    } failure:^(NSError *error) {
-                                        failure(error);
-                                    }];
+             
+             
+             [FBRequestConnection startWithGraphPath:@"/me/ids_for_business"
+                                   completionHandler:^(
+                                                       FBRequestConnection *connection,
+                                                       id result,
+                                                       NSError *error
+                                                       ) {
+                                       
+                                       NSLog(@"ids_for_business result : %@", result);
+                                       
+                                       NSError *errorJ;
+                                       NSData *jsonData = [NSJSONSerialization dataWithJSONObject:result
+                                                                                          options:NSJSONWritingPrettyPrinted
+                                                                                            error:&errorJ];
+                                       NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+                                       
+                                       
+                                       [mcl GetAmbitUserInfoViaOpenID:self.email
+                                                              openUID:self.facebookID
+                                                           login_type:LOGIN_TYPE_FACEBOOK
+                                                                sysID:ottName
+                                                              idGroup:jsonString
+                                                              success:^(id responseObject) {
+                                                                  success(responseObject);
+                                                              } failure:^(NSError *error) {
+                                                                  failure(error);
+                                                              }];
+                                       
+                                   }];
+             
+             
+             
              
          }else {
              //NSLog(@"error : %@", error);
              [FBRequestConnection startForMeWithCompletionHandler:^(FBRequestConnection *connection, id<FBGraphUser> user, NSError *error) {
                  
                  if (!error) {
+                     NSLog(@"user 2: %@", user);
 //                     success(user);
 
                      MCLogin* mcl = [[MCLogin alloc] init];
                      self.email = [user objectForKey:@"email"];
                      self.facebookID = [user objectForKey:@"id"];
-                     [mcl GetAmbitUserInfoViaOpenID:self.email
-                                            openUID:self.facebookID
-                                         login_type:LOGIN_TYPE_FACEBOOK
-                                              sysID:ottName
-                                            success:^(id responseObject) {
-                                                success(responseObject);
-                                            } failure:^(NSError *error) {
-                                                failure(error);
-                                            }];
+                     [FBRequestConnection startWithGraphPath:@"/me/ids_for_business"
+                                           completionHandler:^(
+                                                               FBRequestConnection *connection,
+                                                               id result,
+                                                               NSError *error
+                                                               ) {
+                                               NSLog(@"ids_for_business result 2: %@", result);
+                                               NSError *errorJ;
+                                               NSData *jsonData = [NSJSONSerialization dataWithJSONObject:result
+                                                                                                  options:NSJSONWritingPrettyPrinted
+                                                                                                    error:&errorJ];
+                                               NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+                                               [mcl GetAmbitUserInfoViaOpenID:self.email
+                                                                      openUID:self.facebookID
+                                                                   login_type:LOGIN_TYPE_FACEBOOK
+                                                                        sysID:ottName
+                                                                      idGroup:jsonString
+                                                                      success:^(id responseObject) {
+                                                                          success(responseObject);
+                                                                      } failure:^(NSError *error) {
+                                                                          failure(error);
+                                                                      }];
+                                               
+                                           }];
+                     
                  }else{
                      failure(error);
                  }

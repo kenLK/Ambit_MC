@@ -84,6 +84,7 @@
                                openUID:(NSString *)openUID
                             login_type:(NSString *)login_type
                                  sysID:(NSString *)sysID
+                               idGroup:(NSString *)idGroup
                                success:(void (^)(id responseObject))success
                                failure:(void (^)(NSError *error))failure
 {
@@ -139,6 +140,12 @@
     urlString = [urlString stringByAppendingFormat:@"LOGIN_UID=%@&",openUID];
     urlString = [urlString stringByAppendingFormat:@"EMAIL=%@&",email];
     urlString = [urlString stringByAppendingFormat:@"VALID_STR=%@&",base64Encoded];
+    
+    //20150316 多重facebook app_id
+    if ([login_type isEqual:LOGIN_TYPE_FACEBOOK] && idGroup != nil) {
+
+        urlString = [urlString stringByAppendingFormat:@"ID_GROUP=%@&",[idGroup stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]]];
+    }
 
     MCLogger(@"url====0.0==>%@",urlString);
     NSMutableURLRequest *urlrequest = [[NSMutableURLRequest alloc] init];

@@ -29,6 +29,7 @@
                                openUID:(NSString *)openUID
                             login_type:(NSString*)login_type
                                  sysID:(NSString*) sysID
+                                 idGroup:(NSString*) idGroup
                                success:(void (^)(id responseObject))success
                                failure:(void (^)(NSError *error))failure;
 

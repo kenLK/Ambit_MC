@@ -132,6 +132,7 @@ static NSString * const kClientId = @"1039948666930-tc2134amp1a1r836b5iq5lf2pnnq
                                                openUID:person.identifier
                                             login_type:LOGIN_TYPE_GOOGLE
                                                  sysID:ottName
+                                               idGroup:nil
                                                success:^(id responseObject) {
 //                                                   success(responseObject);
                                                    
