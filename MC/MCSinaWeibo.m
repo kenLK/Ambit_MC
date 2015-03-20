@@ -33,17 +33,20 @@
          {
              if (granted)
              {
-//                 NSArray *accountsArray = [self.accountStore accountsWithAccountType:weiboAcc];
+                 NSArray *accountsArray = [self.accountStore accountsWithAccountType:weiboAcc];
                  //[AppCommon hideProgressHUD];
                  NSDictionary *sinaWeiboAccount = [[self.accountStore accountsWithAccountType:weiboAcc] lastObject];
-                 NSLog(@"weiboAcc UserName: %@", [sinaWeiboAccount valueForKey:@"username"]);
+                 NSLog(@"weiboAcc UserName1: %@", [sinaWeiboAccount valueForKey:@"username"]);
                  
-//                 ACAccount *account = accountsArray[0];
-//                 NSString *userID = ((NSDictionary*)[account valueForKey:@"properties"])[@"user_id"];
-                 NSString *userID = [sinaWeiboAccount valueForKey:@"user_id"];
-                 
+                 ACAccount *account = accountsArray[0];
+                 NSString *userID = ((NSDictionary*)[account valueForKey:@"properties"])[@"user_id"];
+                 NSLog(@"weiboAcc0");
+                 //NSString *userID = [sinaWeiboAccount valueForKey:@"user_id"];
+                 NSLog(@"weiboAcc");
                  [[NSUserDefaults standardUserDefaults] setObject:userID forKey:@"sinaWeiboUserID"];
+                                  NSLog(@"weiboAcc2");
                  [[NSUserDefaults standardUserDefaults] setObject:[sinaWeiboAccount valueForKey:@"username"] forKey:@"sinaWeiboUserEMAIL"];
+                                  NSLog(@"weiboAcc3");
                  [[NSUserDefaults standardUserDefaults] synchronize];
                  [self dismissViewControllerAnimated:YES completion:nil];
                  
