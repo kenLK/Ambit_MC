@@ -18,6 +18,7 @@
 #define LOGIN_TYPE_YAHOO        @"YAHOO"
 #define LOGIN_TYPE_SINAWEIBO    @"WEIBO"    //微博
 #define LOGIN_TYPE_WEIXIN       @"WEIXIN"   //微信
+#define LOGIN_TYPE_APTG       @"APTG"   //亞太
 
 #define VERIFY_SECRET_KEY @""
 
