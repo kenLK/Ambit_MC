@@ -22,7 +22,7 @@
 @implementation MCGooglePlus
 @synthesize signIn,group,email,googlePlusID;
 ///google plus client id
-static NSString * const kClientId = @"1039948666930-tc2134amp1a1r836b5iq5lf2pnnq3s05.apps.googleusercontent.com";
+static NSString * const kClientId = @"834759886613-u716johhr2nbc6hphmt3a984buoaekhc.apps.googleusercontent.com";
 
 -(id) init {
     self = [super init];
@@ -41,10 +41,24 @@ static NSString * const kClientId = @"1039948666930-tc2134amp1a1r836b5iq5lf2pnnq
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     MCLogger(@"viewDidLoad>>>>>>>INTO>>>>>>");
+    
+    NSString *plistPath = [[NSBundle mainBundle] pathForResource:@"MCCONFIG" ofType:@"plist"];
+    if (plistPath == nil) {
+        MCLogger(@"<Parameter Setting> Properity list not found [error code:101]");
+    }
+    NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:plistPath];
+    
+    
 
     signIn = [GPPSignIn sharedInstance];
     // You previously set kClientId in the "Initialize the Google+ client" step
-    signIn.clientID = kClientId;
+    if ([dict objectForKey:@"GooglePlus"] != nil) {
+        signIn.clientID = [dict objectForKey:@"GooglePlus"];
+        MCLogger(@"google+ api key:%@", [dict objectForKey:@"GooglePlus"]);
+    } else {
+        signIn.clientID = kClientId;
+    }
+    
     signIn.scopes = [NSArray arrayWithObjects:
                      kGTLAuthScopePlusLogin, // defined in GTLPlusConstants.h
                      nil];
